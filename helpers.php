@@ -68,19 +68,22 @@ function extractFromTags($path_and_file){
 
     $ThisFileInfo = $getID3->analyze($path_and_file);
 
-    $tags = $ThisFileInfo['tags']['id3v2'];
+//    echo '<pre>';
+//    print_r($ThisFileInfo);
 
+    $tags = $ThisFileInfo['tags']['id3v2'];
 
     $song = [];
 //    $song['filename'] = $path_and_file; <- different if using import script or recreate script
     $song['duration'] = 200;
+    $song['comment'] = isset($tags['comment'][0])? $tags['comment'][0] : '';
     $song['artist'] = $tags['artist'][0];
     $song['title'] = $tags['title'][0];
     $song['album'] = $tags['album'][0];
     $song['track_number'] = $tags['track_number'][0];
     $song['year'] = isset($tags['year'][0])? $tags['year'][0] : '';
     $song['genre'] = isset($tags['genre'][0])? $tags['genre'][0] : '';
-    $song['composer'] = isset($tags['composer'][0] )? $tags['composer'][0] : $song['artist'][0];
+    $song['composer'] = isset($tags['composer'][0] )? $tags['composer'][0] : $song['artist'];
     $song['isrc'] = isset($tags['isrc'][0])? $tags['isrc'][0] : "*****";
     $song['mood'] = isset($tags['mood'][0]) ? $tags['mood'][0] : "*****";
 
@@ -89,10 +92,29 @@ function extractFromTags($path_and_file){
     $song['track_number'] = intval($song_track[0]);
 
     $song_track = $song['track_number'];
-
     $song['id'] = ( intval($song['isrc']) * 100 ) + $song_track;
 	
 	$song['year'] = substr($song['year'],0,4);
+
+    $song['duration'] = 1000 * $ThisFileInfo['playtime_seconds'];
+
+    if( strripos($song['comment'],'ategory')){
+
+        foreach(str_split($song['comment']) as $k => $letter){
+            if ($letter == '3'){
+                $song['category'] = 3;
+                break;
+            }
+            if ($letter == '2'){
+                $song['category'] = 2;
+                break;
+            }
+            // else
+        }
+
+    } else {
+        $song['category'] ='';
+    }
 
 	
 //	$song['title'] = str_replace('\x','',
@@ -109,7 +131,6 @@ function extractFromTags($path_and_file){
 //echo $ThisFileInfo['comments_html']['artist'][0]; // artist from any/all available tag formats
 //echo $ThisFileInfo['tags']['id3v2']['title'][0];  // title from ID3v2
 //echo $ThisFileInfo['audio']['bitrate'];           // audio bitrate
-//echo $ThisFileInfo['playtime_string'];            // playtime in minutes:seconds, formatted string
 
 }
 
@@ -122,12 +143,6 @@ function ingest_song($db, $song){
 
     global $target_db_name;
 
-	echo $song['title']    .'<hr>';
-	echo replace_accents($song['title'])    .'<hr>';
-
-	
-	
-	
     $query = "INSERT INTO `".$target_db_name."`.`songlist`
         (`filename`,
         `duration`,
@@ -139,10 +154,11 @@ function ingest_song($db, $song){
         `ISRC`,
         `albumyear`,
         `genre`,
+        `info`,
         `mood`)
         VALUES
         ('".
-        mysqli_real_escape_string($db,$song['filename'])."','".
+        mysqli_real_escape_string($db,$song['filename'].time())."','".
         $song['duration']."','".
         mysqli_real_escape_string($db,replace_accents($song['artist']))."','".
         mysqli_real_escape_string($db,replace_accents($song['title']))."','".
@@ -152,11 +168,18 @@ function ingest_song($db, $song){
         $song['isrc']."','".
         $song['year']."','".
         mysqli_real_escape_string($db,replace_accents($song['genre']))."','".
+        mysqli_real_escape_string($db,$song['comment'])."','".
         $song['mood']."')";
 
 
+
+
+
     if( mysqli_query($db,$query) ){
-        return true;
+
+        $song['id'] = mysqli_insert_id($db);
+        return categories($song);
+
     } else {
 		
 		echo 'problem:'.mysqli_error($db).' query:'.$query;
@@ -165,6 +188,67 @@ function ingest_song($db, $song){
 		}
 }
 
+function categories($song){
+    global $db;
+    $content = array();
+
+    $categories = explode(' ',$song['mood']);
+
+    $cancon = false;
+    $femcon = false;
+    foreach($categories as $k => $v){
+        if(strtolower(substr($v,0,3)) == 'can'){
+            apply_category($song['id'], 'cancon');
+            $cancon = true;
+        }
+
+        if(strtolower(substr($v,0,3)) == 'fem'){
+            apply_category($song['id'], 'femcon');
+            $femcon = true;
+        }
+
+        if($cancon && $femcon){
+            apply_category($song['id'], 'cancon femcon');
+
+        }
+    }
+
+    if ($cancon && ($song['category'] == 2) ){
+
+        apply_category($song['id'], 'cancon 2');
+
+    } else if ($cancon && ($song['category'] == 3) ){
+
+        apply_category($song['id'], 'cancon 3');
+    }
+
+    return true;
+}
+
+function apply_category($id, $category){
+    global $sam_category;
+    global $target_db_name;
+    global $db;
+
+    $cat_id = $sam_category[$category];
+
+    $query = "INSERT INTO `".$target_db_name."`.`categorylist`
+        (`songID`,`categoryID`,`sortID`)
+        VALUES
+        ('".
+        $id."','".
+        $cat_id."','".
+        "0')";
+
+    if ( mysqli_query($db, $query)){
+
+        return true;
+    }    else {
+
+        echo mysqli_error($db);
+        return false;
+    }
+}
 
 
 
@@ -184,7 +268,7 @@ function replace_accents($string){
 
 
 
-		$unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+	$unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
 									'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
 									'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
 									'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
