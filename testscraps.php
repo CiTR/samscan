@@ -16,6 +16,7 @@ $file = $file_list[0];
     $song = extractFromTags($file); 
 	
 	$a_title = 'Canção de Amor';
+	$a_title = 'Café Tacuba';
 	echo "<pre>";
 	 
 	

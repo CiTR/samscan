@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 
 require_once("CONFIG.php");
 require_once("helpers.php");
@@ -26,21 +26,21 @@ if (!$import_without_moving && !is_writable($library_root) ){
 process_dir($music_import_dir);
 
 $count = 0;
+$imported = 0;
+$copied = 0;
 foreach($file_list as $k => $file){
 
     $song = extractFromTags($file);
 
 // echo $new_file.'<br/>';
 
-    echo '~'.mb_detect_encoding($song['artist']).'~';
-    
     if ($import_without_moving){
         $song['filename'] = $file;
         // JUST IMPORT
         if (ingest_song($db,$song) ){
             echo 'successfully imported '.$file.'.<br/>';
         }  else {
-            echo 'problem: '.mysqli_error($db);
+            echo 'problem: '.mysqli_error($db).'<br/>';
         }
 
     } else {
@@ -50,6 +50,8 @@ foreach($file_list as $k => $file){
         $safe_album = sanitize_for_filename($song['album']);
         $safe_title = sanitize_for_filename($song['title']);
 
+//        echo '~'.mb_detect_encoding($song['artist']).'~';
+		
 
         $new_path = $library_root
             . substr( $safe_artist , 0, 1)
@@ -71,22 +73,30 @@ foreach($file_list as $k => $file){
         $song['filename'] = $new_path.$new_file;
 
         if(!is_dir($new_path) ) mkdir($new_path, 777, true);
-
-        copy($file, $new_path . $new_file);
-        echo $new_file . '<br/>';
-
+		
+		if ( !file_exists ($new_path.$new_file) || !( filesize($new_path.$new_file) == filesize($file) ) ){
+			echo '<br/>--- copying '.$new_path.$new_file.'...';
+			copy($file, $new_path . $new_file);
+		} else {
+			echo '<br/>--- file already exists: '.$new_path.$new_file.'...';
+		}
         if( file_exists ($new_path.$new_file) && ( filesize($new_path.$new_file) == filesize($file) ) )
-
             {
+			echo '&#x2713;';
+			$copied++;
     //		unlink($file); // deleting doesn't work for some reason (permissions / security
-                if (ingest_song($db,$song) ) echo 'safe to delete '.$file.'.<br/>';
-                echo $song['artist'].' - '.$song['title'].' ('.$song['composer'].') <br/>';
+                if (ingest_song($db,$song) ){
+					echo ' imported (can delete) <br/> ';
+					$imported++;
+					} 
             }
     }
 
 	$count++;
 }
 
-echo '<hr/>processed '.$count.' files';
+echo '<hr/><h3>examined '.$count.' files</h3>';
+echo '<hr/><h3>copied '.$copied.' files (or already existed)</h3>';
+echo '<hr/><h3>imported '.$imported.' files</h3>';
 
 ?>

@@ -138,6 +138,7 @@ function extractFromTags($path_and_file){
 
 function ingest_song($db, $song){
 
+
     $song['filename'] = str_replace('E:/Library/','L:/',$song['filename']);
     $song['filename'] = str_replace('../Test-lib/','L:/',$song['filename']);
 
@@ -158,7 +159,7 @@ function ingest_song($db, $song){
         `mood`)
         VALUES
         ('".
-        mysqli_real_escape_string($db,$song['filename'].time())."','".
+        mysqli_real_escape_string($db,$song['filename'])."','".
         $song['duration']."','".
         mysqli_real_escape_string($db,replace_accents($song['artist']))."','".
         mysqli_real_escape_string($db,replace_accents($song['title']))."','".
@@ -182,7 +183,7 @@ function ingest_song($db, $song){
 
     } else {
 		
-		echo 'problem:'.mysqli_error($db).' query:'.$query;
+		echo 'problem:'.mysqli_error($db).' query:'.$query.'<br/>';
     
         return false;
 		}
@@ -245,7 +246,7 @@ function apply_category($id, $category){
         return true;
     }    else {
 
-        echo mysqli_error($db);
+        echo mysqli_error($db).'    '.$query;
         return false;
     }
 }
@@ -258,15 +259,13 @@ function file_extension($filename){
 }
 
 function sanitize_for_filename($string){
-    $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
-    $string = preg_replace("([\.:;])", '-', $string);
 	$string = replace_accents($string);
+    $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
+    $string = preg_replace("([\.:;¡])", '-', $string);
     return $string;
 }  
 
 function replace_accents($string){
-
-
 
 	$unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
 									'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
@@ -274,7 +273,9 @@ function replace_accents($string){
 									'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
 									'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
 
-    return strtr( $string, $unwanted_array );
+    $outstring = strtr( $string, $unwanted_array );
+	
+	return $outstring;
 }
 
 
