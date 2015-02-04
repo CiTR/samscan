@@ -51,7 +51,7 @@ foreach($file_list as $k => $file){
         $new_path = $library_root
             . substr( $safe_artist , 0, 1)
             ."/"
-            . substr( $safe_artist, 0, 2)
+            . trim( substr( $safe_artist, 0, 2) )
             ."/"
             . $safe_artist
             ."/"
