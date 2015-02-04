@@ -7,6 +7,15 @@ $music_import_dir = "../Test-ingest/";
 //folder in which to put files (your digital library drive)
 $library_root = "../Test-lib/";
 
+$sam_category = [
+    'cancon' => 2,
+    'femcon' => 3,
+    'cancon femcon' => 4,
+    'playlist' => 5,
+    'cancon 2' => 23,
+    'cancon 3' => 24
+];
+
 
 $target_db_name = "SAMreconstructtest2";
 
