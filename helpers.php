@@ -145,6 +145,7 @@ function ingest_song($db, $song){
     global $target_db_name;
 
     $max_length = [
+        'id' => 11,
         'filename' => 255,
         'duration' => 11,
         'artist' => 255,
@@ -156,7 +157,8 @@ function ingest_song($db, $song){
         'year' => 4,
         'genre' => 20,
         'comment' => 10000,
-        'mood' => 50
+        'mood' => 50,
+        'category' => 50
 
     ];
 
