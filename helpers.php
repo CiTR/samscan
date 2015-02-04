@@ -163,7 +163,7 @@ function ingest_song($db, $song){
     ];
 
     foreach($song as $k => $v){
-        $song[$k] = substr($v,  $max_length[$k]);
+        $song[$k] = substr($v, 0,  $max_length[$k]);
     }
 
     $query = "INSERT INTO `".$target_db_name."`.`songlist`
