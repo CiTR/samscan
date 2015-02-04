@@ -69,7 +69,8 @@ foreach($file_list as $k => $file){
 
         if(!is_dir($new_path) ) mkdir($new_path, 777, true);
 
-        echo copy($file, $new_path . $new_file) . "|" . $new_file . '<br/>';
+        copy($file, $new_path . $new_file);
+        echo $new_file . '<br/>';
 
         if( file_exists ($new_path.$new_file) && ( filesize($new_path.$new_file) == filesize($file) ) )
 
