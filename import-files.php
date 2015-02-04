@@ -48,6 +48,8 @@ foreach($file_list as $k => $file){
         $safe_album = sanitize_for_filename($song['album']);
         $safe_title = sanitize_for_filename($song['title']);
 
+        echo '~'.mb_detect_encoding($song['artist']).'~';
+
         $new_path = $library_root
             . substr( $safe_artist , 0, 1)
             ."/"
