@@ -144,6 +144,26 @@ function ingest_song($db, $song){
 
     global $target_db_name;
 
+    $max_length = [
+        'filename' => 255,
+        'duration' => 11,
+        'artist' => 255,
+        'title' => 255,
+        'album' => 255,
+        'track_number' => 11,
+        'composer' => 100,
+        'isrc' => 50,
+        'year' => 4,
+        'genre' => 20,
+        'comment' => 10000,
+        'mood' => 50
+
+    ];
+
+    foreach($song as $k => $v){
+        $song[$k] = substr($v,  $max_length[$k]);
+    }
+
     $query = "INSERT INTO `".$target_db_name."`.`songlist`
         (`filename`,
         `duration`,
