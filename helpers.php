@@ -84,8 +84,8 @@ function extractFromTags($path_and_file){
     $song['year'] = isset($tags['year'][0])? $tags['year'][0] : '';
     $song['genre'] = isset($tags['genre'][0])? $tags['genre'][0] : '';
     $song['composer'] = isset($tags['composer'][0] )? $tags['composer'][0] : $song['artist'];
-    $song['isrc'] = isset($tags['isrc'][0])? $tags['isrc'][0] : "*****";
-    $song['mood'] = isset($tags['mood'][0]) ? $tags['mood'][0] : "*****";
+    $song['isrc'] = isset($tags['isrc'][0])? $tags['isrc'][0] : "";
+    $song['mood'] = isset($tags['mood'][0]) ? $tags['mood'][0] : "";
 
 
     $song_track = explode('/', $song['track_number']);
