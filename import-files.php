@@ -77,7 +77,15 @@ foreach($file_list as $k => $file){
 		if ( !file_exists ($new_path.$new_file) || !( filesize($new_path.$new_file) == filesize($file) ) ){
         $song = trim_fields($song);
 			  echo '<br/>--- copying '.$song['filename'].'...';
-			  copy($file, $song['filename']);
+
+        try {
+            copy($file, $song['filename']);
+        } catch (Exception $e) {
+            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } finally {
+            echo "First finally.\n";
+        }
+
 
 		} else {
 			echo '<br/>--- file already exists: '.$new_path.$new_file.'...';
