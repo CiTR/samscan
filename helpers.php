@@ -134,6 +134,36 @@ function extractFromTags($path_and_file){
 
 }
 
+function trim_fields($song){
+
+    $max_length = [
+        'id' => 11,
+        'filename' => 250,
+        'duration' => 11,
+        'artist' => 255,
+        'title' => 255,
+        'album' => 255,
+        'track_number' => 11,
+        'composer' => 100,
+        'isrc' => 50,
+        'year' => 4,
+        'genre' => 20,
+        'comment' => 10000, /// arbitrary
+        'mood' => 50,
+        'category' => 50
+
+    ];
+
+    foreach($song as $k => $v){
+        $song[$k] = substr($v, 0,  $max_length[$k]);
+    }
+
+    if( substr($song['filename'],-4,4) != '.mp3'){
+        $song['filename'] .= '.mp3';
+    }
+
+    return $song;
+}
 
 
 function ingest_song($db, $song){
@@ -144,27 +174,6 @@ function ingest_song($db, $song){
 
     global $target_db_name;
 
-    $max_length = [
-        'id' => 11,
-        'filename' => 255,
-        'duration' => 11,
-        'artist' => 255,
-        'title' => 255,
-        'album' => 255,
-        'track_number' => 11,
-        'composer' => 100,
-        'isrc' => 50,
-        'year' => 4,
-        'genre' => 20,
-        'comment' => 10000,
-        'mood' => 50,
-        'category' => 50
-
-    ];
-
-    foreach($song as $k => $v){
-        $song[$k] = substr($v, 0,  $max_length[$k]);
-    }
 
     $query = "INSERT INTO `".$target_db_name."`.`songlist`
         (`filename`,

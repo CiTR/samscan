@@ -75,8 +75,10 @@ foreach($file_list as $k => $file){
         if(!is_dir($new_path) ) mkdir($new_path, 777, true);
 		
 		if ( !file_exists ($new_path.$new_file) || !( filesize($new_path.$new_file) == filesize($file) ) ){
-			echo '<br/>--- copying '.$new_path.$new_file.'...';
-			copy($file, $new_path . $new_file);
+        $song = trim_fields($song);
+			  echo '<br/>--- copying '.$song['filename'].'...';
+			  copy($file, $song['filename']);
+
 		} else {
 			echo '<br/>--- file already exists: '.$new_path.$new_file.'...';
 		}
