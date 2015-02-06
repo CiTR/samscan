@@ -28,6 +28,10 @@ process_dir($music_import_dir);
 $count = 0;
 $imported = 0;
 $copied = 0;
+
+$copy_problems = [];
+$import_problems = [];
+
 foreach($file_list as $k => $file){
 
     $song = extractFromTags($file);
@@ -74,33 +78,43 @@ foreach($file_list as $k => $file){
 
         if(!is_dir($new_path) ) mkdir($new_path, 777, true);
 		
-		if ( !file_exists ($new_path.$new_file) || !( filesize($new_path.$new_file) == filesize($file) ) ){
-        $song = trim_fields($song);
-			  echo '<br/>--- copying '.$song['filename'].'...';
-
-        try {
-            copy($file, $song['filename']);
-        } catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-        } finally {
-            echo "First finally.\n";
-        }
-
+		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
+			$song = trim_fields($song);
+			echo '<br/>--- copying '.$song['filename'].'...';
+			
+			if( file_exists($file) && is_readable($file) ){
+				copy($file, $song['filename']);
+			//	echo 'copy '.$file.' to '.$song['filename'].'<br/>';
+				}
+				else {
+				echo '<h3>could not copy - file does not exist</h3>';
+				}
 
 		} else {
 			echo '<br/>--- file already exists: '.$new_path.$new_file.'...';
 		}
-        if( file_exists ($new_path.$new_file) && ( filesize($new_path.$new_file) == filesize($file) ) )
+        if( file_exists ($song['filename']) && ( filesize($song['filename']) == filesize($file) ) )
             {
 			echo '&#x2713;';
 			$copied++;
     //		unlink($file); // deleting doesn't work for some reason (permissions / security
+	
+			$song['filename'] = str_replace('../Library/','L:/',$song['filename']);
+			$song['filename'] = str_replace('../Test-lib/','L:/',$song['filename']);
+			
+			
                 if (ingest_song($db,$song) ){
 					echo ' imported (can delete) <br/> ';
 					$imported++;
-					} 
-            }
-    }
+					} else {
+					$import_problems []= $song['filename'].' could not be imported into DB ';
+					}
+            } else {
+			echo '<h3>problem:exists?('.file_exists ($song['filename']).')||filesize of dest?('.filesize($song['filename']).')||filesize of source?('.filesize($file).')||';
+			
+				$copy_problems []= $file.' could not be copied to library folder';
+			}
+    } 
 
 	$count++;
 }
@@ -109,4 +123,9 @@ echo '<hr/><h3>examined '.$count.' files</h3>';
 echo '<hr/><h3>copied '.$copied.' files (or already existed)</h3>';
 echo '<hr/><h3>imported '.$imported.' files</h3>';
 
+if( ($count != $copied) || ($copied != $imported) ){
+	echo '<hr/><pre>';
+	print_r($import_problems);
+	print_r($copy_problems);
+}
 ?>

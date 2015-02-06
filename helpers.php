@@ -138,7 +138,7 @@ function trim_fields($song){
 
     $max_length = [
         'id' => 11,
-        'filename' => 250,
+        'filename' => 200,
         'duration' => 11,
         'artist' => 255,
         'title' => 255,
@@ -169,8 +169,6 @@ function trim_fields($song){
 function ingest_song($db, $song){
 
 
-    $song['filename'] = str_replace('E:/Library/','L:/',$song['filename']);
-    $song['filename'] = str_replace('../Test-lib/','L:/',$song['filename']);
 
     global $target_db_name;
 
@@ -292,7 +290,7 @@ function file_extension($filename){
 function sanitize_for_filename($string){
 	$string = replace_accents($string);
     $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
-    $string = preg_replace("([\.:;¡])", '-', $string);
+    $string = preg_replace("([\.:;¡…])", '-', $string);
     return $string;
 }  
 
@@ -302,7 +300,7 @@ function replace_accents($string){
 									'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
 									'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
 									'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
-									'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
+									'ö'=>'o', 'ø'=>'o', 'ù'=>'u', 'ü'=>'u' 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
 
     $outstring = strtr( $string, $unwanted_array );
 	
