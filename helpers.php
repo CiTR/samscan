@@ -84,8 +84,8 @@ function extractFromTags($path_and_file){
     $song['year'] = isset($tags['year'][0])? $tags['year'][0] : '';
     $song['genre'] = isset($tags['genre'][0])? $tags['genre'][0] : '';
     $song['composer'] = isset($tags['composer'][0] )? $tags['composer'][0] : $song['artist'];
-    $song['isrc'] = isset($tags['isrc'][0])? $tags['isrc'][0] : "*****";
-    $song['mood'] = isset($tags['mood'][0]) ? $tags['mood'][0] : "*****";
+    $song['isrc'] = isset($tags['isrc'][0])? $tags['isrc'][0] : "";
+    $song['mood'] = isset($tags['mood'][0]) ? $tags['mood'][0] : "";
 
 
     $song_track = explode('/', $song['track_number']);
@@ -296,7 +296,7 @@ function sanitize_for_filename($string){
 
 function replace_accents($string){
 
-	$unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+	$unwanted_array = array(    'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'AE', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
 									'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
 									'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
 									'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
