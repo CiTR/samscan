@@ -2,9 +2,10 @@
 
 require_once('CONFIG.php');
 require_once('helpers.php');
-$string = "Little Darla's dog ?!@#$%^&*(){}[]\||\:::...;;éêel´p´hí´cçeçåcáâ;../////\\\\:;' Has A Treat For You, Volume 23: Summer 2005";
+$string = "Little Darla's dog ?!@#$%^&*(){}[]\||\:::...;;éêel´p´hí´cçeçåcáâ;. “Skip”./////\\\\:;' Has A Treat For You, Volume 23: Summer 2005";
 
-//echo sanitize_for_filename($string);
+echo "before:<br/>".$string;
+echo "after:<br/>".sanitize_for_filename($string);
 
 $file_list = [];
 
