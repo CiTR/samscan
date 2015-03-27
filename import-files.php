@@ -55,7 +55,6 @@ foreach($file_list as $k => $file){
         $safe_title = sanitize_for_filename($song['title']);
 
 //        echo '~'.mb_detect_encoding($song['artist']).'~';
-		
 
         $new_path = $library_root
             . substr( $safe_artist , 0, 1)
@@ -76,8 +75,10 @@ foreach($file_list as $k => $file){
 
         $song['filename'] = $new_path.$new_file;
 
+        $song = trim_fields($song);
+
         if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
-		
+
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
 			echo '<br/>--- copying '.$song['filename'].'...';
 			
@@ -101,7 +102,6 @@ foreach($file_list as $k => $file){
 
       $song['filename'] = correct_path_differences($song['filename']);
 			$database_error = '';
-      $song = trim_fields($song);
         if (ingest_song($db,$song) ){
 					echo '  (ok to delete source file) <br/> ';
 					$imported++;
@@ -115,7 +115,7 @@ foreach($file_list as $k => $file){
             echo file_exists ($song['filename'])? 'yes':'no';
             echo ')';
             echo '<br/>';
-            echo 'filesize of destination file?('.filesize($song['filename']).')<br/>filesize of source?('.filesize($file).')||';
+            echo 'filesize of destination file?('.filesize($song['filename']).')<br/>filesize of source?('.filesize($file).')</h3>';
 			
 				$copy_problems []= $file.' could not be copied to library folder';
 			}

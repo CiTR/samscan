@@ -146,7 +146,7 @@ function trim_fields($song){
         'id' => 11,
         'filename' => 200,
         'duration' => 11,
-        'artist' => 255,
+        'artist' => 170,
         'title' => 255,
         'album' => 255,
         'track_number' => 11,
@@ -235,7 +235,7 @@ function ingest_song($db, $song){
     } else {
 
         $database_error .= ' '.mysqli_error($db).' query:'.$query.'. ';
-        echo '&nbsp;&nbsp;&nbsp;&nbsp;song imported: <font size="25">X</font>;';
+        echo '&nbsp;&nbsp;&nbsp;&nbsp;song imported: <font size="25">X</font>';
         return false;
 		}
 }
@@ -310,6 +310,8 @@ function file_extension($filename){
 }
 
 function sanitize_for_filename($string){
+
+    $string = substr($string, 0,  60);
 	$string = replace_accents($string);
     $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
     $string = preg_replace("([\.:;¡‐…])", '-', $string);
