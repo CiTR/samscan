@@ -34,10 +34,18 @@ if($error == '') {
     foreach ($file_list as $k => $file){
 
         $song = extractFromTags($file);
-		$song['filename'] = $file;
+
+        $arr = mbStringToArray($file);
+
+        echo '<pre>';
+        echo mb_detect_encoding($file);
+        print_r($arr);
+        echo'</pre>';
+		    $song['filename'] = $file;
 		
         $result = ingest_song($db, $song);
         if ( $result == 1 ){
+
             echo $song['artist']." - ".$song['title']." ingested successfully <br/>";
         } else {
             echo mysqli_error($db);
@@ -56,3 +64,13 @@ if($error == '') {
 
 
 
+function mbStringToArray ($string) {
+    $array = [];
+    $strlen = strlen($string);
+    while ($strlen) {
+        $array[] = substr($string,0,1);
+        $string = substr($string,1,$strlen);
+        $strlen = strlen($string);
+    }
+    return $array;
+}

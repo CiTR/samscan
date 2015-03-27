@@ -134,6 +134,12 @@ function extractFromTags($path_and_file){
 
 }
 
+function correct_path_differences($string){
+    global $sam_path_prefix;
+    global $library_root;
+    return str_replace($library_root,$sam_path_prefix,$string);
+}
+
 function trim_fields($song){
 
     $max_length = [
@@ -171,7 +177,22 @@ function ingest_song($db, $song){
 
 
     global $target_db_name;
+    global $database_error;
 
+    $replaced = array();
+    $replaced['artist'] = replace_accents($song['artist']);
+    $replaced['title'] = replace_accents($song['title']);
+    $replaced['album'] = replace_accents($song['album']);
+    $replaced['composer'] = replace_accents($song['composer']);
+    $replaced['genre'] = replace_accents($song['genre']);
+
+    foreach($replaced as $i => $v){
+        if (mb_detect_encoding($v) == 'UTF-8'){
+            $database_error .= ' '.$i.' ('.$v.') is not latin. SAM hates non-latin. ';
+
+        }
+
+    }
 
     $query = "INSERT INTO `".$target_db_name."`.`songlist`
         (`filename`,
@@ -188,16 +209,16 @@ function ingest_song($db, $song){
         `mood`)
         VALUES
         ('".
-        mysqli_real_escape_string($db,$song['filename'])."','".
+        mysqli_real_escape_string($db,mb_convert_encoding($song['filename'],'latin1') )."','".
         $song['duration']."','".
-        mysqli_real_escape_string($db,replace_accents($song['artist']))."','".
-        mysqli_real_escape_string($db,replace_accents($song['title']))."','".
-        mysqli_real_escape_string($db,replace_accents($song['album']))."','".
+        mysqli_real_escape_string($db,$replaced['artist'])."','".
+        mysqli_real_escape_string($db,$replaced['title'])."','".
+        mysqli_real_escape_string($db,$replaced['album'])."','".
         $song['track_number']."','".
-        mysqli_real_escape_string($db,replace_accents($song['composer']))."','".
+        mysqli_real_escape_string($db,$replaced['composer'])."','".
         $song['isrc']."','".
         $song['year']."','".
-        mysqli_real_escape_string($db,replace_accents($song['genre']))."','".
+        mysqli_real_escape_string($db,$replaced['genre'])."','".
         mysqli_real_escape_string($db,$song['comment'])."','".
         $song['mood']."')";
 
@@ -205,14 +226,15 @@ function ingest_song($db, $song){
 
 
 
-    if( mysqli_query($db,$query) ){
+    if( $database_error == '' && mysqli_query($db,$query) ){
 
         $song['id'] = mysqli_insert_id($db);
+        echo 'song imported: &#x2713;';
         return categories($song);
 
     } else {
-		
-		echo 'problem:'.mysqli_error($db).' query:'.$query.'<br/>';
+
+        $database_error .= ' '.mysqli_error($db);//.' query:'.$query.'. ';
     
         return false;
 		}
@@ -290,20 +312,21 @@ function file_extension($filename){
 function sanitize_for_filename($string){
 	$string = replace_accents($string);
     $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
-    $string = preg_replace("([\.:;¡…])", '-', $string);
+    $string = preg_replace("([\.:;¡‐…])", '-', $string);
+
     return $string;
 }
 function replace_accents($string){
 
-	$unwanted_array = array(  '“'=>"'", '”' => "'",  'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'AE', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
+	$unwanted_array = array( '‐'=> '-', '“'=>"'", '”' => "'",  'Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'AE', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
 									'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
 									'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss', 'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a', 'ç'=>'c',
 									'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o',
 									'ö'=>'o', 'ø'=>'o', 'œ'=>'oe', 'ù'=>'u', 'ü'=>'u', 'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y' );
 
     $outstring = strtr( $string, $unwanted_array );
-	
-	return $outstring;
+
+    return $outstring;
 }
 
 

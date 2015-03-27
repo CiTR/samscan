@@ -9,8 +9,6 @@ if(isset($_GET['import_only']) && ($_GET['import_only'] == 'true') ) {
 } else {
     $import_without_moving = false;
 }
-// this array is populated by the recursive call below
-$file_list = [];
 
 if (!$import_without_moving && !is_dir($library_root)){
     echo 'not a dir: '.$library_root.'<br/>';
@@ -23,6 +21,8 @@ if (!$import_without_moving && !is_writable($library_root) ){
     return;
 }
 
+// this array is populated by the recursive call below
+$file_list = [];
 process_dir($music_import_dir);
 
 $count = 0;
@@ -76,7 +76,7 @@ foreach($file_list as $k => $file){
 
         $song['filename'] = $new_path.$new_file;
 
-        if(!is_dir($new_path) ) mkdir($new_path, 777, true);
+        if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
 		
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
 			$song = trim_fields($song);
@@ -95,19 +95,18 @@ foreach($file_list as $k => $file){
 		}
         if( file_exists ($song['filename']) && ( filesize($song['filename']) == filesize($file) ) )
             {
-			echo '&#x2713;';
+			echo '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file copied: &#x2713;';
 			$copied++;
     //		unlink($file); // deleting doesn't work for some reason (permissions / security
-	
-			$song['filename'] = str_replace('../Library/','L:/',$song['filename']);
-			$song['filename'] = str_replace('../Test-lib/','L:/',$song['filename']);
-			
-			
+
+
+      $song['filename'] = correct_path_differences($song['filename']);
+			$database_error = '';
                 if (ingest_song($db,$song) ){
 					echo ' imported (can delete) <br/> ';
 					$imported++;
 					} else {
-					$import_problems []= $song['filename'].' could not be imported into DB ';
+					$import_problems []= $song['filename'].' could not be imported into DB: '.$database_error;
 					}
             } else {
 			echo '<h3>problem:exists?('.file_exists ($song['filename']).')||filesize of dest?('.filesize($song['filename']).')||filesize of source?('.filesize($file).')||';
