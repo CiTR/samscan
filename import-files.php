@@ -79,7 +79,6 @@ foreach($file_list as $k => $file){
         if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
 		
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
-			$song = trim_fields($song);
 			echo '<br/>--- copying '.$song['filename'].'...';
 			
 			if( file_exists($file) && is_readable($file) ){
@@ -102,14 +101,21 @@ foreach($file_list as $k => $file){
 
       $song['filename'] = correct_path_differences($song['filename']);
 			$database_error = '';
-                if (ingest_song($db,$song) ){
-					echo ' imported (can delete) <br/> ';
+      $song = trim_fields($song);
+        if (ingest_song($db,$song) ){
+					echo '  (ok to delete source file) <br/> ';
 					$imported++;
-					} else {
+					}
+        else {
 					$import_problems []= $song['filename'].' could not be imported into DB: '.$database_error;
 					}
             } else {
-			echo '<h3>problem:exists?('.file_exists ($song['filename']).')||filesize of dest?('.filesize($song['filename']).')||filesize of source?('.filesize($file).')||';
+			      echo '<h3>problem copying file. ';
+            echo ' <br/>does the song exist at destination? ';
+            echo file_exists ($song['filename'])? 'yes':'no';
+            echo ')';
+            echo '<br/>';
+            echo 'filesize of destination file?('.filesize($song['filename']).')<br/>filesize of source?('.filesize($file).')||';
 			
 				$copy_problems []= $file.' could not be copied to library folder';
 			}
@@ -124,7 +130,9 @@ echo '<hr/><h3>imported '.$imported.' files</h3>';
 
 if( ($count != $copied) || ($copied != $imported) ){
 	echo '<hr/><pre>';
+    echo '<br/>import problems:<br/>';
 	print_r($import_problems);
+    echo '<br/>copy problems:<br/>';
 	print_r($copy_problems);
 }
 ?>

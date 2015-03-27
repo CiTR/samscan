@@ -12,15 +12,15 @@ $getID3 = new getID3();
 
 
 function execute_sql($db, $script){
-
+global $error;
     $sqlArray = explode(';',$script);
     foreach ($sqlArray as $stmt) {
         if (strlen($stmt)>3 && substr(ltrim($stmt),0,2)!='/*') {
             $result = mysqli_query($db, $stmt);
             if (!$result) {
-                $error .= '(error #'.mysqli_errno($db).') ';
+                $error .= ' (error #'.mysqli_errno($db).') ';
                 $error .= mysqli_error($db);
-                $error .= 'statement: '.$stmt;
+                $error .= ' statement: '.$stmt;
                 return $error;
             }
         }
@@ -187,8 +187,8 @@ function ingest_song($db, $song){
     $replaced['genre'] = replace_accents($song['genre']);
 
     foreach($replaced as $i => $v){
-        if (mb_detect_encoding($v) == 'UTF-8'){
-            $database_error .= ' '.$i.' ('.$v.') is not latin. SAM hates non-latin. ';
+        if (mb_detect_encoding($v) != 'ASCII'){
+            $database_error .= ' '.$i.' ('.$v.') is not latin ('.mb_detect_encoding($v).') SAM hates non-latin. ';
 
         }
 
@@ -234,8 +234,8 @@ function ingest_song($db, $song){
 
     } else {
 
-        $database_error .= ' '.mysqli_error($db);//.' query:'.$query.'. ';
-    
+        $database_error .= ' '.mysqli_error($db).' query:'.$query.'. ';
+        echo '&nbsp;&nbsp;&nbsp;&nbsp;song imported: <font size="25">X</font>;';
         return false;
 		}
 }
