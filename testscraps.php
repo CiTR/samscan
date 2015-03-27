@@ -21,7 +21,7 @@ $file = $file_list[0];
 	echo "<pre>";
 	 
 	
-	
+	/*
 	echo "a_title: ".$a_title."\n";
 	echo "$song[title]: ".$song["title"]."\n";
 	echo "Canção de Amor: "."Canção de Amor"."\n";
@@ -33,6 +33,18 @@ $file = $file_list[0];
 	echo "$temp: ".replace_accents($temp)."\n";
 	echo "$song[title]: ".replace_accents($song['title'])."\n";
 	echo "Canção de Amor: ".replace_accents("Canção de Amor")."\n";
+	*/
+	
+foreach($file_list as $i => $f){
+echo $f;
+echo '<br/>';
+
+}
+	
+	
+	
+	
+	
 	
 	
 ?>
