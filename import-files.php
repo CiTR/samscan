@@ -23,7 +23,14 @@ if (!$import_without_moving && !is_writable($library_root) ){
 
 // this array is populated by the recursive call below
 $file_list = [];
-process_dir($music_import_dir);
+
+if (process_dir($music_import_dir))
+{
+    // great!
+}
+else {
+    echo $error;
+};
 
 $count = 0;
 $imported = 0;
@@ -36,9 +43,11 @@ foreach($file_list as $k => $file){
 
     $song = extractFromTags($file);
 
+    if (!$song) echo $error;
+
 // echo $new_file.'<br/>';
 
-    if ($import_without_moving){
+    if ($error == '' && $import_without_moving){
         $song['filename'] = $file;
         // JUST IMPORT
         if (ingest_song($db,$song) ){
@@ -47,7 +56,7 @@ foreach($file_list as $k => $file){
             echo 'problem: '.mysqli_error($db).'<br/>';
         }
 
-    } else {
+    } else if ($error == '') {
         // COPY AND IMPORT
 
         $safe_artist = sanitize_for_filename($song['artist']);
@@ -126,7 +135,7 @@ foreach($file_list as $k => $file){
 
 echo '<hr/><h3>examined '.$count.' files</h3>';
 echo '<hr/><h3>copied '.$copied.' files (or already existed)</h3>';
-echo '<hr/><h3>imported '.$imported.' files</h3>';
+echo '<hr/><h3>imported '.$imported.' files into SAM</h3>';
 
 if( ($count != $copied) || ($copied != $imported) ){
 	echo '<hr/><pre>';

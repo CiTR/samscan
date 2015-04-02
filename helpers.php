@@ -31,6 +31,7 @@ global $error;
 function process_dir($dir){
     global $count; // int value is 0 initially
     global $file_list; // array to populate with filename list
+    global $error;
 
     $dir_contents = scandir($dir);
 
@@ -38,7 +39,14 @@ function process_dir($dir){
 
         // IF ITS A DIR, RECURSE
         if ( is_dir($dir.$filename) && substr($filename,0,1) != "." )  {
-            process_dir($dir.$filename."/");
+            if ($filename == "The Highlife Movement...ESTUARY") xdebug_break();
+            if(process_dir($dir.$filename."/"))
+            {
+
+            } else {
+                $error .= "  can't process file: ".$dir.$filename."   ";
+                return false;
+            }
         } else {
 
         }
@@ -57,6 +65,7 @@ function process_dir($dir){
 
         }
     }
+    return true;
 
 
 }
@@ -65,9 +74,14 @@ function process_dir($dir){
 function extractFromTags($path_and_file){
 
     global $getID3;
+    global $error;
 
     $ThisFileInfo = $getID3->analyze($path_and_file);
 
+    if (!array_key_exists('id3v2',$ThisFileInfo['tags'])){
+        $error .= ' <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no id3v2 tag found in file:.'.$path_and_file;
+        return false;
+    }
 //    echo '<pre>';
 //    print_r($ThisFileInfo);
 
@@ -229,13 +243,13 @@ function ingest_song($db, $song){
     if( $database_error == '' && mysqli_query($db,$query) ){
 
         $song['id'] = mysqli_insert_id($db);
-        echo 'song imported: &#x2713;';
+        echo 'imported into SAM: &#x2713;';
         return categories($song);
 
     } else {
 
         $database_error .= ' '.mysqli_error($db).' query:'.$query.'. ';
-        echo '&nbsp;&nbsp;&nbsp;&nbsp;song imported: <font size="25">X</font>';
+        echo '&nbsp;&nbsp;&nbsp;&nbsp;imported into SAM: X';
         return false;
 		}
 }

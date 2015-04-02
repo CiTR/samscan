@@ -1,4 +1,6 @@
 ﻿<?php
+echo '<meta http-equiv="Content-Type"
+ content="text/html; charset=UTF-8">';
 
  
 //folder to scan for new music to add
@@ -30,6 +32,7 @@ $db_password = '';
 
 $sam_path_prefix = "L:/";
 //$sam_path_prefix = $library_root;
+$error = '';
 
 $db = new mysqli($db_address, $db_username, $db_password);
 if (mysqli_connect_error()) {
