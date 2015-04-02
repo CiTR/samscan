@@ -20,7 +20,7 @@ if (!$import_without_moving && !is_writable($library_root) ){
     echo 'user: '.get_current_user();
     return;
 }
-
+echo 'scanning...';
 // this array is populated by the recursive call below
 $file_list = [];
 
@@ -30,6 +30,7 @@ if (process_dir($music_import_dir))
 }
 else {
     echo $error;
+	return;
 };
 
 $count = 0;
@@ -89,11 +90,12 @@ foreach($file_list as $k => $file){
         if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
 
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
-			echo '<br/>--- copying '.$song['filename'].'...';
+			echo '<br/>--- copying....<br/><pre>';
+			print_r($song);
+			echo '</pre>';
 			
 			if( file_exists($file) && is_readable($file) ){
 				copy($file, $song['filename']);
-			//	echo 'copy '.$file.' to '.$song['filename'].'<br/>';
 				}
 				else {
 				echo '<h3>could not copy - file does not exist</h3>';
