@@ -39,7 +39,7 @@ function process_dir($dir){
 
         // IF ITS A DIR, RECURSE
         if ( is_dir($dir.$filename) && substr($filename,0,1) != "." )  {
-            if ($filename == "The Highlife Movement...ESTUARY") xdebug_break();
+
             if(process_dir($dir.$filename."/"))
             {
 
