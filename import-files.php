@@ -20,13 +20,14 @@ if (!$import_without_moving && !is_writable($library_root) ){
     echo 'user: '.get_current_user();
     return;
 }
-echo 'scanning...';
+echo 'scanning'.$library_root.'...<br/>';
 // this array is populated by the recursive call below
 $file_list = [];
 
 if (process_dir($music_import_dir))
 {
     // great!
+    echo 'found '.count($file_list).' mp3 files to scan...<br/>';
 }
 else {
     echo $error;
@@ -96,8 +97,8 @@ foreach($file_list as $k => $file){
 			
 			if( file_exists($file) && is_readable($file) ){
 			echo '<br/>copying '.$file.' to '.$song['filename'].'<br/>';
-				$copied = copy($file, $song['filename']);
-				if (!$copied) echo ' ***problem copying '.$file.' to '.$song['filename'].'. ';
+				$copied_yes = copy($file, $song['filename']);
+				if (!$copied_yes) echo ' ***problem copying '.$file.' to '.$song['filename'].'. ';
 				}
 				else {
 				echo '<h3>could not copy - file does not exist</h3>';
@@ -132,9 +133,11 @@ foreach($file_list as $k => $file){
 			
 				$copy_problems []= $file.' could not be copied to library folder';
 			}
-    } 
 
-	$count++;
+        $count++;
+    }
+    else { echo 'ERROR: '.$error;}
+
 }
 
 echo '<hr/><h3>examined '.$count.' files</h3>';
