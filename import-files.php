@@ -38,19 +38,12 @@ $count = 0;
 $imported = 0;
 $copied = 0;
 
-$copy_problems = [];
-$import_problems = [];
+$copy_problems = array();
+$import_problems = array();
 
 foreach($file_list as $k => $file){
 
     $song = extractFromTags($file);
-
-    if (!$song) {
-        echo $error;
-        $copy_problems []= $error;
-    }
-
-// echo $new_file.'<br/>';
 
     if ($error == '' && $import_without_moving){
         $song['filename'] = $file;
@@ -61,7 +54,7 @@ foreach($file_list as $k => $file){
             echo 'problem: '.mysqli_error($db).'<br/>';
         }
 
-    } else if ($error == '') {
+    } else if ($song && ($error == '') ) {
         // COPY AND IMPORT
 
         $safe_artist = sanitize_for_filename($song['artist']);
@@ -96,12 +89,12 @@ foreach($file_list as $k => $file){
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
 			
 			if( file_exists($file) && is_readable($file) ){
-			echo '<br/>copying '.$file.' to '.$song['filename'].'<br/>';
-				$copied_yes = copy($file, $song['filename']);
-				if (!$copied_yes) echo ' ***problem copying '.$file.' to '.$song['filename'].'. ';
+            echo '<br/>copying '.$file.' to '.$song['filename'].'<br/>';
+            $copied_yes = copy($file, $song['filename']);
+            if (!$copied_yes) echo ' ***problem copying '.$file.' to '.$song['filename'].'. ';
 				}
 				else {
-				echo '<h3>could not copy - file does not exist</h3>';
+				    echo '<h3>could not copy - source file does not exist</h3>';
 				}
 
 		} else {
@@ -124,19 +117,31 @@ foreach($file_list as $k => $file){
 					$import_problems []= $song['filename'].' could not be imported into DB: '.$database_error;
 					}
             } else {
-			      echo '<h3>problem copying file. ';
-            echo ' <br/>does the song exist at destination? ';
-            echo file_exists ($song['filename'])? 'yes':'no';
-            echo ')';
-            echo '<br/>';
-            echo 'filesize of destination file?('.filesize($song['filename']).')<br/>filesize of source?('.filesize($file).')</h3>';
-			
-				$copy_problems []= $file.' could not be copied to library folder';
+            echo '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;file copied: X';
+
+            $copyproblem = '';
+
+			      $copyproblem.= 'Problem copying file "'.$file.'" to '.$song['filename'];
+            $copyproblem.= '. Does the song exist at destination? (';
+            $copyproblem.= file_exists ($song['filename'])? 'yes':'no';
+            $copyproblem.= ')';
+            $copyproblem.= ' What is the ';
+            $copyproblem.= 'filesize of destination file?('.filesize($song['filename']).')  What about the filesize of the source?('.filesize($file);
+            $copyproblem.= ')';
+            $copyproblem.= '. Is the destination folder writable? (';
+            $copyproblem.= is_writable($new_path)? 'yes':'no';
+            $copyproblem.= ')  ';
+    				$copy_problems []= $copyproblem;
 			}
 
         $count++;
     }
-    else { echo 'ERROR: '.$error;}
+    else {
+
+        $copy_problems []= $error;
+        $error = '';
+
+    }
 
 }
 
@@ -146,9 +151,9 @@ echo '<hr/><h3>imported '.$imported.' files into SAM</h3>';
 
 if( ($count != $copied) || ($copied != $imported) ){
 	echo '<hr/><pre>';
+    echo '<br/>copy problems:<br/>';
+    print_r($copy_problems);
     echo '<br/>import problems:<br/>';
 	print_r($import_problems);
-    echo '<br/>copy problems:<br/>';
-	print_r($copy_problems);
 }
 ?>

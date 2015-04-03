@@ -79,7 +79,7 @@ function extractFromTags($path_and_file){
     $ThisFileInfo = $getID3->analyze($path_and_file);
 
     if (!array_key_exists('id3v2',$ThisFileInfo['tags'])){
-        $error .= ' <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;no id3v2 tag found in file:.'.$path_and_file;
+        $error .= ' <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(skipped) no id3v2 tags found in file:.'.$path_and_file;
         return false;
     }
 //    echo '<pre>';
