@@ -90,12 +90,16 @@ foreach($file_list as $k => $file){
         if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
 
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
-			echo '<br/>--- copying....<br/><pre>';
-			print_r($song);
-			echo '</pre>';
+//			echo '<br/>--- copying....<br/><pre>';
+//			print_r($song);
+//			echo '</pre>';
 			
 			if( file_exists($file) && is_readable($file) ){
-				copy($file, $song['filename']);
+			echo '<br/>copying '.$file.' to '.$song['filename'].'<br/>';
+			//../Library/N/Ni/Ninos con Bombas/El Nino/03 Ninos con Bombas - Listen Now- 	Canal Grande.mp3
+			//	$copied = copy($file, '../Library/N/Ni/Ninos con Bombas/El Nino/03 Ninos con Bombas - Listen Now- Canal Grande.mp3');
+				$copied = copy($file, $song['filename']);
+				if (!$copied) echo ' ***problem copying '.$file.' to '.$song['filename'].'. ';
 				}
 				else {
 				echo '<h3>could not copy - file does not exist</h3>';
