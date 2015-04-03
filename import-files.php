@@ -90,9 +90,6 @@ foreach($file_list as $k => $file){
         if(!is_dir($new_path) ) mkdir($new_path, 0777, true);
 
 		if ( !file_exists ($song['filename']) || !( filesize($song['filename']) == filesize($file) ) ){
-			echo '<br/>--- copying....<br/><pre>';
-			print_r($song);
-			echo '</pre>';
 			
 			if( file_exists($file) && is_readable($file) ){
 				copy($file, $song['filename']);
