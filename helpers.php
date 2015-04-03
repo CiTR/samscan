@@ -329,6 +329,8 @@ function sanitize_for_filename($string){
 	$string = replace_accents($string);
     $string = preg_replace("([^\w\s\d\-_~,;:\[\]\(\).])", '-', $string);
     $string = preg_replace("([\.:;¡‐…])", '-', $string);
+	$string = preg_replace('/\t+/', ' ', $string);
+	$string = preg_replace("/\r\n|\r|\n/", ' ', $string);
 
     return $string;
 }
