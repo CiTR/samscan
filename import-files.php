@@ -44,7 +44,10 @@ foreach($file_list as $k => $file){
 
     $song = extractFromTags($file);
 
-    if (!$song) echo $error;
+    if (!$song) {
+        echo $error;
+        $copy_problems []= $error;
+    }
 
 // echo $new_file.'<br/>';
 
