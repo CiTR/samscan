@@ -144,10 +144,11 @@ foreach($file_list as $k => $file){
     }
 
 }
-
+echo '<hr/><h3>folder contains '.count($file_list).' mp3 files</h3>';
 echo '<hr/><h3>examined '.$count.' files</h3>';
 echo '<hr/><h3>copied '.$copied.' files (or already existed)</h3>';
 echo '<hr/><h3>imported '.$imported.' files into SAM</h3>';
+
 
 $report = "\n\n\n**************************\n log from ".date('F j, Y - h:i:s a').":";
 
