@@ -149,11 +149,41 @@ echo '<hr/><h3>examined '.$count.' files</h3>';
 echo '<hr/><h3>copied '.$copied.' files (or already existed)</h3>';
 echo '<hr/><h3>imported '.$imported.' files into SAM</h3>';
 
+$report = "\n\n\n**************************\n log from ".date('F j, Y - h:i:s a').":";
+
 if( ($count != $copied) || ($copied != $imported) ){
-	echo '<hr/><pre>';
-    echo '<br/>copy problems:<br/>';
-    print_r($copy_problems);
-    echo '<br/>import problems:<br/>';
-	print_r($import_problems);
+
+
+    $report .= "\n";
+    $report .= "\ncopy problems:\n";
+    $report .= print_r($copy_problems, true);
+    $report .= "\nimport problems:\n";
+	  $report .= print_r($import_problems, true);
+
+
+
+} else {
+    $report .= 'no problems found!';
 }
+
+
+    if(file_exists($music_import_dir.'/log.txt')){
+        if (is_writable($music_import_dir.'/log.txt')) {
+
+            $logfile = $music_import_dir.'/log.txt';
+
+            $log_contents = file_get_contents($logfile);
+
+            file_put_contents($logfile, $report.$log_contents );
+
+            echo 'report logged:<br/>';
+
+        } else {
+            echo 'log file not writable by user:'.get_current_user().'<br/>';
+        }
+    } else {
+        echo 'log file not found.<br/>';
+    }
+
+    echo '<pre>'.$report;
 ?>
