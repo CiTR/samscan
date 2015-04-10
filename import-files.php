@@ -4,6 +4,11 @@ require_once("CONFIG.php");
 require_once("helpers.php");
 //above script reads $target_db_name and populates $creation_script
 
+$playlist = (isset($_GET['playlist']) && $_GET['playlist'] == 'true');
+if($playlist){
+    $music_import_dir = $playlist_import_dir;
+}
+
 if(isset($_GET['import_only']) && ($_GET['import_only'] == 'true') ) {
     $import_without_moving = true;
 } else {
@@ -20,7 +25,8 @@ if (!$import_without_moving && !is_writable($library_root) ){
     echo 'user: '.get_current_user();
     return;
 }
-echo 'scanning'.$library_root.'...<br/>';
+
+echo 'scanning'.$music_import_dir.'...<br/>';
 // this array is populated by the recursive call below
 $file_list = [];
 
@@ -48,7 +54,7 @@ foreach($file_list as $k => $file){
     if ($error == '' && $import_without_moving){
         $song['filename'] = $file;
         // JUST IMPORT
-        if (ingest_song($db,$song) ){
+        if (ingest_song($db,$song, $playlist) ){
             echo 'successfully imported '.$file.'.<br/>';
         }  else {
             echo 'problem: '.mysqli_error($db).'<br/>';
@@ -108,8 +114,10 @@ foreach($file_list as $k => $file){
 
 
       $song['filename'] = correct_path_differences($song['filename']);
+
+
 			$database_error = '';
-        if (ingest_song($db,$song) ){
+        if (ingest_song($db,$song, $playlist) ){
 					echo '  (ok to delete source file) <br/> ';
 					$imported++;
 					}
@@ -168,10 +176,10 @@ if( ($count != $copied) || ($copied != $imported) ){
 }
 
 
-    if(file_exists($music_import_dir.'/log.txt')){
-        if (is_writable($music_import_dir.'/log.txt')) {
+    if(file_exists($music_import_dir.'../log.txt')){
+        if (is_writable($music_import_dir.'../log.txt')) {
 
-            $logfile = $music_import_dir.'/log.txt';
+            $logfile = $music_import_dir.'../log.txt';
 
             $log_contents = file_get_contents($logfile);
 

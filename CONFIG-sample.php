@@ -4,10 +4,11 @@ echo '<meta http-equiv="Content-Type"
 
  
 //folder to scan for new music to add
-$music_import_dir = "../Test-ingest/";
+$music_import_dir = "../FOR SAM/library/";
+$playlist_import_dir =  "../FOR SAM/playlist/";
 
 //folder in which to put files (your digital library drive)
-$library_root = "../Test-lib/";
+$library_root = "../Library/";
 
 
 

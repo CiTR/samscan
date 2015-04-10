@@ -186,7 +186,7 @@ function trim_fields($song){
 }
 
 
-function ingest_song($db, $song){
+function ingest_song($db, $song, $playlist = false){
 
 
 
@@ -244,7 +244,7 @@ function ingest_song($db, $song){
 
         $song['id'] = mysqli_insert_id($db);
         echo 'imported into SAM: &#x2713;';
-        return categories($song);
+        return categories($song, $playlist);
 
     } else {
 
@@ -254,7 +254,7 @@ function ingest_song($db, $song){
 		}
 }
 
-function categories($song){
+function categories($song, $playlist = false){
     global $db;
     $content = array();
 
@@ -286,6 +286,10 @@ function categories($song){
     } else if ($cancon && ($song['category'] == 3) ){
 
         apply_category($song['id'], 'cancon 3');
+    }
+
+    if($playlist){
+        apply_category($song['id'], 'playlist');
     }
 
     return true;
